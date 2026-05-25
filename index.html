@@ -1,277 +1,836 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GHOST_DAR // Deep Space Abandonee Tracker</title>
-    <style>
-        :root {
-            --neon-green: #00ff66;
-            --dark-green: #003311;
-            --terminal-black: #050b05;
-            --alert-red: #ff3333;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        body {
-            background-color: var(--terminal-black);
-            color: var(--neon-green);
-            font-family: 'Courier New', Courier, monospace;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
-        }
+<title>GHOST RADAR</title>
 
-        /* CRT Screen Scanline Effect */
-        body::before {
-            content: " ";
-            display: block;
-            position: fixed;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 2;
-            background-size: 100% 4px, 6px 100%;
-            pointer-events: none;
-        }
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800&display=swap" rel="stylesheet">
 
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            border: 1px solid var(--neon-green);
-            padding: 10px 40px;
-            box-shadow: 0 0 15px var(--dark-green);
-        }
+<style>
 
-        h1 {
-            margin: 0;
-            font-size: 2rem;
-            letter-spacing: 4px;
-            text-shadow: 0 0 8px var(--neon-green);
-        }
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Orbitron',sans-serif;
+}
 
-        .container {
-            display: flex;
-            gap: 40px;
-            max-width: 1200px;
-            width: 100%;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
+body{
+background:#02040b;
+overflow-x:hidden;
+color:white;
+}
 
-        /* Controls & Inputs */
-        .panel {
-            border: 1px solid var(--neon-green);
-            padding: 20px;
-            background: rgba(0, 20, 5, 0.5);
-            box-shadow: 0 0 10px var(--dark-green);
-            flex: 1;
-            min-width: 300px;
-            max-width: 450px;
-        }
+/* ================= BACKGROUND ================= */
 
-        .panel h2 {
-            margin-top: 0;
-            border-bottom: 1px solid var(--neon-green);
-            padding-bottom: 5px;
-            font-size: 1.2rem;
-        }
+.bg{
+position:fixed;
+width:100%;
+height:100%;
+top:0;
+left:0;
+background:
+radial-gradient(circle at center,#071a2a 0%,#010207 80%);
+overflow:hidden;
+z-index:-5;
+}
 
-        .input-group {
-            margin-bottom: 15px;
-        }
+.stars{
+position:absolute;
+width:100%;
+height:100%;
+background-image:
+radial-gradient(white 1px,transparent 1px);
+background-size:40px 40px;
+opacity:0.15;
+animation:starsMove 150s linear infinite;
+}
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-        }
+@keyframes starsMove{
+from{
+transform:translateY(0);
+}
+to{
+transform:translateY(-2000px);
+}
+}
 
-        input, select, button {
-            width: 100%;
-            background: var(--terminal-black);
-            border: 1px solid var(--neon-green);
-            color: var(--neon-green);
-            padding: 10px;
-            font-family: inherit;
-            box-sizing: border-box;
-        }
+.grid{
+position:absolute;
+bottom:-40%;
+width:100%;
+height:100%;
+background-image:
+linear-gradient(rgba(0,255,255,0.08) 1px,transparent 1px),
+linear-gradient(90deg,rgba(0,255,255,0.08) 1px,transparent 1px);
+background-size:70px 70px;
+transform:perspective(500px) rotateX(75deg);
+transform-origin:bottom;
+}
 
-        input:focus, select:focus {
-            outline: none;
-            box-shadow: 0 0 8px var(--neon-green);
-        }
+/* ================= LOGIN ================= */
 
-        button {
-            cursor: pointer;
-            font-weight: bold;
-            background: var(--dark-green);
-            transition: all 0.2s;
-            text-transform: uppercase;
-        }
+.login-screen{
+width:100%;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+position:relative;
+}
 
-        button:hover {
-            background: var(--neon-green);
-            color: var(--terminal-black);
-            box-shadow: 0 0 15px var(--neon-green);
-        }
+.login-box{
+width:480px;
+background:rgba(0,0,0,0.4);
+backdrop-filter:blur(20px);
+border:1px solid rgba(0,255,255,0.2);
+padding:50px;
+border-radius:35px;
+position:relative;
+overflow:hidden;
+box-shadow:
+0 0 50px rgba(0,255,255,0.1),
+0 0 120px rgba(0,255,255,0.05);
+}
 
-        /* Target Manifest / Output */
-        .manifest {
-            flex: 1.5;
-            min-width: 300px;
-        }
+.login-box::before{
+content:"";
+position:absolute;
+width:500px;
+height:500px;
+background:
+radial-gradient(circle,rgba(0,255,255,0.15),transparent 70%);
+top:-250px;
+right:-250px;
+}
 
-        .target-card {
-            border: 1px dashed var(--neon-green);
-            padding: 15px;
-            margin-bottom: 15px;
-            background: rgba(0, 10, 2, 0.7);
-            position: relative;
-            animation: static-flicker 0.3s ease;
-        }
+.radar-logo{
+width:150px;
+height:150px;
+margin:auto;
+border-radius:50%;
+border:3px solid #00f7ff;
+position:relative;
+box-shadow:
+0 0 20px rgba(0,255,255,0.5),
+0 0 50px rgba(0,255,255,0.3);
+}
 
-        .target-card.level-5 {
-            border-color: var(--alert-red);
-            color: var(--alert-red);
-            box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
-        }
+.radar-logo::before{
+content:"";
+position:absolute;
+width:50%;
+height:50%;
+background:
+linear-gradient(45deg,
+rgba(0,255,255,0.5),
+transparent);
+top:50%;
+left:50%;
+transform-origin:top left;
+animation:sweep 3s linear infinite;
+}
 
-        .target-header {
-            display: flex;
-            justify-content: space-between;
-            font-weight: bold;
-            border-bottom: 1px dotted currentColor;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
-        }
+.radar-logo::after{
+content:"";
+position:absolute;
+width:15px;
+height:15px;
+background:#00f7ff;
+border-radius:50%;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+box-shadow:0 0 30px #00f7ff;
+}
 
-        .threat-badge {
-            text-transform: uppercase;
-            padding: 2px 6px;
-            border: 1px solid currentColor;
-        }
+@keyframes sweep{
+from{
+transform:rotate(0deg);
+}
+to{
+transform:rotate(360deg);
+}
+}
 
-        /* Animations */
-        @keyframes static-flicker {
-            0% { opacity: 0.3; }
-            50% { opacity: 1; }
-            70% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
-    </style>
+.title{
+font-size:55px;
+text-align:center;
+margin-top:30px;
+color:#00f7ff;
+letter-spacing:5px;
+text-shadow:
+0 0 10px rgba(0,255,255,0.8),
+0 0 40px rgba(0,255,255,0.5);
+}
+
+.subtitle{
+text-align:center;
+margin-top:15px;
+color:#84a7b7;
+font-size:13px;
+letter-spacing:2px;
+margin-bottom:35px;
+line-height:1.8;
+}
+
+.login-box input{
+width:100%;
+padding:18px;
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(0,255,255,0.15);
+border-radius:15px;
+outline:none;
+margin-bottom:20px;
+color:white;
+font-size:15px;
+}
+
+.login-box input::placeholder{
+color:#7ea7b3;
+}
+
+.login-box button{
+width:100%;
+padding:18px;
+border:none;
+border-radius:15px;
+cursor:pointer;
+font-size:15px;
+font-weight:bold;
+background:
+linear-gradient(90deg,#00f7ff,#008cff);
+color:black;
+transition:0.4s;
+}
+
+.login-box button:hover{
+transform:scale(1.03);
+box-shadow:0 0 40px rgba(0,255,255,0.5);
+}
+
+.warning{
+text-align:center;
+margin-top:20px;
+font-size:12px;
+color:#ff5577;
+letter-spacing:2px;
+animation:blink 1s infinite;
+}
+
+@keyframes blink{
+0%{opacity:1;}
+50%{opacity:0.4;}
+100%{opacity:1;}
+}
+
+/* ================= DASHBOARD ================= */
+
+.dashboard{
+padding:40px;
+display:none;
+}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+gap:20px;
+margin-bottom:40px;
+}
+
+.topbar h1{
+font-size:42px;
+color:#00f7ff;
+text-shadow:0 0 20px rgba(0,255,255,0.5);
+}
+
+.agent-card{
+display:flex;
+align-items:center;
+gap:15px;
+padding:15px 25px;
+background:rgba(255,255,255,0.04);
+border-radius:20px;
+border:1px solid rgba(0,255,255,0.1);
+}
+
+.avatar{
+width:60px;
+height:60px;
+border-radius:50%;
+background:
+linear-gradient(135deg,#00f7ff,#0077ff);
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:24px;
+font-weight:bold;
+color:black;
+}
+
+.main-grid{
+display:grid;
+grid-template-columns:420px 1fr;
+gap:40px;
+}
+
+/* ================= RADAR ================= */
+
+.radar-box{
+background:rgba(255,255,255,0.03);
+border-radius:35px;
+padding:25px;
+border:1px solid rgba(0,255,255,0.1);
+}
+
+.radar{
+width:100%;
+aspect-ratio:1/1;
+border-radius:50%;
+position:relative;
+overflow:hidden;
+background:
+radial-gradient(circle,#042033,#01050b);
+border:2px solid rgba(0,255,255,0.2);
+}
+
+.scan{
+position:absolute;
+width:50%;
+height:50%;
+background:
+linear-gradient(45deg,
+rgba(0,255,255,0.45),
+transparent);
+top:50%;
+left:50%;
+transform-origin:top left;
+animation:sweep 4s linear infinite;
+}
+
+.ring{
+position:absolute;
+border:1px solid rgba(0,255,255,0.2);
+border-radius:50%;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+}
+
+.r1{
+width:120px;
+height:120px;
+}
+
+.r2{
+width:240px;
+height:240px;
+}
+
+.r3{
+width:360px;
+height:360px;
+}
+
+.blip{
+position:absolute;
+width:15px;
+height:15px;
+background:#00f7ff;
+border-radius:50%;
+box-shadow:0 0 20px #00f7ff;
+animation:ping 2s infinite;
+}
+
+.b1{
+top:90px;
+left:250px;
+}
+
+.b2{
+top:250px;
+left:90px;
+}
+
+.b3{
+top:320px;
+left:300px;
+}
+
+@keyframes ping{
+0%{
+transform:scale(1);
+opacity:1;
+}
+100%{
+transform:scale(3);
+opacity:0;
+}
+}
+
+/* ================= SIDE PANEL ================= */
+
+.side-panel{
+display:flex;
+flex-direction:column;
+gap:25px;
+}
+
+.panel{
+background:rgba(255,255,255,0.03);
+border-radius:30px;
+padding:30px;
+border:1px solid rgba(0,255,255,0.1);
+}
+
+.panel h2{
+margin-bottom:20px;
+color:#00f7ff;
+}
+
+.panel input{
+width:100%;
+padding:16px;
+margin-bottom:18px;
+border-radius:12px;
+border:1px solid rgba(0,255,255,0.15);
+background:rgba(255,255,255,0.05);
+color:white;
+outline:none;
+}
+
+.panel button{
+width:100%;
+padding:16px;
+border:none;
+border-radius:12px;
+font-weight:bold;
+cursor:pointer;
+background:
+linear-gradient(90deg,#00f7ff,#008cff);
+}
+
+/* ================= CARDS ================= */
+
+.cards{
+display:grid;
+grid-template-columns:
+repeat(auto-fit,minmax(280px,1fr));
+gap:25px;
+margin-top:25px;
+}
+
+.card{
+background:rgba(255,255,255,0.03);
+border-radius:25px;
+padding:25px;
+border:1px solid rgba(0,255,255,0.1);
+position:relative;
+overflow:hidden;
+}
+
+.card::before{
+content:"";
+position:absolute;
+width:250px;
+height:250px;
+background:
+radial-gradient(circle,
+rgba(0,255,255,0.08),
+transparent);
+right:-120px;
+top:-120px;
+}
+
+.card h3{
+font-size:28px;
+margin-bottom:15px;
+}
+
+.card p{
+margin-bottom:12px;
+color:#9fb8c7;
+font-size:13px;
+line-height:1.7;
+}
+
+.level{
+display:inline-block;
+padding:12px 18px;
+border-radius:50px;
+font-size:12px;
+margin-top:10px;
+font-weight:bold;
+}
+
+.level1{
+background:rgba(0,255,120,0.15);
+color:#00ff88;
+}
+
+.level3{
+background:rgba(255,170,0,0.15);
+color:orange;
+}
+
+.level5{
+background:rgba(255,0,90,0.15);
+color:#ff5577;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:1000px){
+
+.main-grid{
+grid-template-columns:1fr;
+}
+
+.topbar h1{
+font-size:30px;
+}
+
+}
+
+</style>
 </head>
+
 <body>
 
-    <header>
-        <h1>GHOST_DAR // SYSTEM_ONLINE</h1>
-        <p>DEEP SPACE EMOTIONAL TRANSMISSION TRACKER</p>
-    </header>
+<div class="bg">
+<div class="stars"></div>
+<div class="grid"></div>
+</div>
 
-    <div class="container">
-        <div class="panel">
-            <h2>LOG NEW UNRESPONSIVE ENTITY</h2>
-            <form id="radar-form">
-                <div class="input-group">
-                    <label for="target-name">Target Designation (Name)</label>
-                    <input type="text" id="target-name" required placeholder="e.g., Kaleb">
-                </div>
-                <div class="input-group">
-                    <label for="last-sector">Last Known Sector (Platform)</label>
-                    <input type="text" id="last-sector" required placeholder="e.g., iMessage Nebula, Tinder Hub">
-                </div>
-                <div class="input-group">
-                    <label for="days-silent">Days Since Last Transmission</label>
-                    <input type="number" id="days-silent" min="0" required placeholder="e.g., 3">
-                </div>
-                <button type="submit">Initialize Tracking Sequence</button>
-            </form>
-        </div>
+<!-- LOGIN -->
 
-        <div class="panel manifest">
-            <h2>CURRENT THREAT MANIFEST</h2>
-            <div id="target-list">
-                </div>
-        </div>
-    </div>
+<div class="login-screen" id="loginScreen">
 
-    <script>
-        document.getElementById('radar-form').addEventListener('submit', function(e) {
-            e.preventDefault();
+<div class="login-box">
 
-            // Get Form Values
-            const name = document.getElementById('target-name').value;
-            const sector = document.getElementById('last-sector').value;
-            const days = parseInt(document.getElementById('days-silent').value);
+<div class="radar-logo"></div>
 
-            // Determine Threat Level Matrix
-            let threatLevel = "";
-            let threatClass = "";
-            let statusBrief = "";
+<h1 class="title">
+GHOST RADAR
+</h1>
 
-            if (days <= 2) {
-                threatLevel = "LEVEL 1: JUST BUSY";
-                statusBrief = "Target likely navigating an asteroid field of work emails. Hold position.";
-            } else if (days <= 5) {
-                threatLevel = "LEVEL 2: ATMOSPHERIC RE-ENTRY";
-                statusBrief = "Target viewed Instagram story without replying. Friction levels rising.";
-            } else if (days <= 10) {
-                threatLevel = "LEVEL 3: ACTIVE AVOIDANCE";
-                statusBrief = "Signal jamming detected. Read receipts disabled. Defensive maneuvers likely.";
-            } else if (days <= 20) {
-                threatLevel = "LEVEL 4: EVENT HORIZON";
-                statusBrief = "Point of no return crossed. Time-dilation will render future replies highly awkward.";
-            } else {
-                threatLevel = "LEVEL 5: CAVE DWELLER";
-                threatClass = "level-5";
-                statusBrief = "Radio silence absolute. Target has presumably entered witness protection or a cave without Wi-Fi.";
-            }
+<p class="subtitle">
+INTERGALACTIC EMOTIONAL SURVEILLANCE SYSTEM<br>
+TRACKING UNKNOWN LIFE FORMS SINCE 2026
+</p>
 
-            // Create Target Card HTML
-            const targetList = document.getElementById('target-list');
-            const targetCard = document.createElement('div');
-            targetCard.className = `target-card ${threatClass}`;
-            
-            targetCard.innerHTML = `
-                <div class="target-header">
-                    <span>IDENT: ${name.toUpperCase()}</span>
-                    <span class="threat-badge">${threatLevel}</span>
-                </div>
-                <div><strong>LAST KNOWN SECTOR:</strong> ${sector.toUpperCase()}</div>
-                <div><strong>DURATION OF SILENCE:</strong> ${days} EARTH DAYS</div>
-                <div style="margin-top: 10px; font-style: italic; font-size: 0.9rem;">
-                    &gt; STATUS: ${statusBrief}
-                </div>
-            `;
+<input
+type="text"
+id="username"
+placeholder="ENTER AGENT NAME">
 
-            // Insert at the top of the manifest
-            targetList.insertBefore(targetCard, targetList.firstChild);
+<button onclick="login()">
+INITIALIZE TRACKING
+</button>
 
-            // Reset Form and trigger a diagnostic audio alert (beep)
-            document.getElementById('radar-form').reset();
-            playDiagnosticPing();
-        });
+<p class="warning">
+WARNING : HIGH LEVEL GHOSTING DETECTED
+</p>
 
-        // Synthetic Audio Ping using Web Audio API
-        function playDiagnosticPing() {
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioCtx.createOscillator();
-            const gainNode = audioCtx.createGain();
+</div>
 
-            oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // High pitch radar ping
-            
-            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4); // Fade out
+</div>
 
-            oscillator.connect(gainNode);
-            gainNode.connect(audioCtx.destination);
+<!-- DASHBOARD -->
 
-            oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.4);
-        }
-    </script>
+<div class="dashboard" id="dashboard">
+
+<div class="topbar">
+
+<h1>Alien Ghost Surveillance</h1>
+
+<div class="agent-card">
+
+<div class="avatar" id="avatar"></div>
+
+<div>
+<p>ACTIVE AGENT</p>
+<h2 id="agent"></h2>
+</div>
+
+</div>
+
+</div>
+
+<div class="main-grid">
+
+<!-- RADAR -->
+
+<div class="radar-box">
+
+<div class="radar">
+
+<div class="scan"></div>
+
+<div class="ring r1"></div>
+<div class="ring r2"></div>
+<div class="ring r3"></div>
+
+<div class="blip b1"></div>
+<div class="blip b2"></div>
+<div class="blip b3"></div>
+
+</div>
+
+</div>
+
+<!-- SIDE -->
+
+<div class="side-panel">
+
+<div class="panel">
+
+<h2>Track New Ghoster</h2>
+
+<input
+type="text"
+id="ghostName"
+placeholder="Target Name">
+
+<input
+type="date"
+id="ghostDate">
+
+<button onclick="addGhoster()">
+ADD TARGET
+</button>
+
+</div>
+
+<div class="panel">
+
+<h2>Threat Database</h2>
+
+<div class="cards" id="cards"></div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+const cards=document.getElementById("cards");
+
+let ghosters=
+JSON.parse(localStorage.getItem("ghosters")) || [];
+
+function login(){
+
+const username=
+document.getElementById("username").value;
+
+if(username===""){
+
+alert("ENTER AGENT NAME");
+return;
+
+}
+
+localStorage.setItem("agent",username);
+
+document.getElementById("loginScreen")
+.style.display="none";
+
+document.getElementById("dashboard")
+.style.display="block";
+
+initialize();
+
+renderGhosters();
+
+dramaticNotification(
+"SYSTEM ONLINE",
+"Satellite connected successfully."
+);
+
+}
+
+function initialize(){
+
+const agent=
+localStorage.getItem("agent");
+
+document.getElementById("agent")
+.innerText=agent;
+
+document.getElementById("avatar")
+.innerText=
+agent.charAt(0).toUpperCase();
+
+}
+
+function addGhoster(){
+
+const name=
+document.getElementById("ghostName").value;
+
+const date=
+document.getElementById("ghostDate").value;
+
+if(name==="" || date===""){
+
+alert("COMPLETE ALL FIELDS");
+return;
+
+}
+
+ghosters.push({
+name,
+date
+});
+
+localStorage.setItem(
+"ghosters",
+JSON.stringify(ghosters)
+);
+
+renderGhosters();
+
+dramaticNotification(
+"NEW TARGET DETECTED",
+name + " added to database."
+);
+
+document.getElementById("ghostName").value="";
+document.getElementById("ghostDate").value="";
+
+}
+
+function renderGhosters(){
+
+cards.innerHTML="";
+
+ghosters.forEach(person=>{
+
+const days=
+calculateDays(person.date);
+
+let levelText=
+"LEVEL 1 : JUST BUSY";
+
+let levelClass=
+"level1";
+
+if(days>7 && days<=20){
+
+levelText=
+"LEVEL 3 : ACTIVE AVOIDANCE";
+
+levelClass=
+"level3";
+
+}
+
+if(days>20){
+
+levelText=
+"LEVEL 5 : LEGALLY DEAD / LIVING IN A CAVE";
+
+levelClass=
+"level5";
+
+}
+
+const card=
+document.createElement("div");
+
+card.className="card";
+
+card.innerHTML=`
+
+<h3>${person.name}</h3>
+
+<p>
+LAST CONTACT : ${person.date}
+</p>
+
+<p>
+DAYS MISSING : ${days}
+</p>
+
+<div class="level ${levelClass}">
+${levelText}
+</div>
+
+`;
+
+cards.appendChild(card);
+
+});
+
+}
+
+function calculateDays(date){
+
+const today=
+new Date();
+
+const last=
+new Date(date);
+
+const diff=
+today-last;
+
+return Math.floor(
+diff/(1000*60*60*24)
+);
+
+}
+
+function dramaticNotification(title,message){
+
+if(Notification.permission==="granted"){
+
+new Notification(title,{
+body:message
+});
+
+}
+
+}
+
+if(Notification.permission!=="granted"){
+
+Notification.requestPermission();
+
+}
+
+window.onload=()=>{
+
+const agent=
+localStorage.getItem("agent");
+
+if(agent){
+
+document.getElementById("loginScreen")
+.style.display="none";
+
+document.getElementById("dashboard")
+.style.display="block";
+
+initialize();
+
+renderGhosters();
+
+}
+
+}
+
+</script>
+
 </body>
 </html>
