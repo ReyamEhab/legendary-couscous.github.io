@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GHOST_DAR // Deep Space Abandonee Tracker</title>
+    <style>
+        :root {
+            --neon-green: #00ff66;
+            --dark-green: #003311;
+            --terminal-black: #050b05;
+            --alert-red: #ff3333;
+        }
+
+        body {
+            background-color: var(--terminal-black);
+            color: var(--neon-green);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+        }
+
+        /* CRT Screen Scanline Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 4px, 6px 100%;
+            pointer-events: none;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid var(--neon-green);
+            padding: 10px 40px;
+            box-shadow: 0 0 15px var(--dark-green);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2rem;
+            letter-spacing: 4px;
+            text-shadow: 0 0 8px var(--neon-green);
+        }
+
+        .container {
+            display: flex;
+            gap: 40px;
+            max-width: 1200px;
+            width: 100%;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Controls & Inputs */
+        .panel {
+            border: 1px solid var(--neon-green);
+            padding: 20px;
+            background: rgba(0, 20, 5, 0.5);
+            box-shadow: 0 0 10px var(--dark-green);
+            flex: 1;
+            min-width: 300px;
+            max-width: 450px;
+        }
+
+        .panel h2 {
+            margin-top: 0;
+            border-bottom: 1px solid var(--neon-green);
+            padding-bottom: 5px;
+            font-size: 1.2rem;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        input, select, button {
+            width: 100%;
+            background: var(--terminal-black);
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 10px;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            box-shadow: 0 0 8px var(--neon-green);
+        }
+
+        button {
+            cursor: pointer;
+            font-weight: bold;
+            background: var(--dark-green);
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: var(--neon-green);
+            color: var(--terminal-black);
+            box-shadow: 0 0 15px var(--neon-green);
+        }
+
+        /* Target Manifest / Output */
+        .manifest {
+            flex: 1.5;
+            min-width: 300px;
+        }
+
+        .target-card {
+            border: 1px dashed var(--neon-green);
+            padding: 15px;
+            margin-bottom: 15px;
+            background: rgba(0, 10, 2, 0.7);
+            position: relative;
+            animation: static-flicker 0.3s ease;
+        }
+
+        .target-card.level-5 {
+            border-color: var(--alert-red);
+            color: var(--alert-red);
+            box-shadow: 0 0 10px rgba(255, 51, 51, 0.3);
+        }
+
+        .target-header {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            border-bottom: 1px dotted currentColor;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .threat-badge {
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border: 1px solid currentColor;
+        }
+
+        /* Animations */
+        @keyframes static-flicker {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            70% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>GHOST_DAR // SYSTEM_ONLINE</h1>
+        <p>DEEP SPACE EMOTIONAL TRANSMISSION TRACKER</p>
+    </header>
+
+    <div class="container">
+        <div class="panel">
+            <h2>LOG NEW UNRESPONSIVE ENTITY</h2>
+            <form id="radar-form">
+                <div class="input-group">
+                    <label for="target-name">Target Designation (Name)</label>
+                    <input type="text" id="target-name" required placeholder="e.g., Kaleb">
+                </div>
+                <div class="input-group">
+                    <label for="last-sector">Last Known Sector (Platform)</label>
+                    <input type="text" id="last-sector" required placeholder="e.g., iMessage Nebula, Tinder Hub">
+                </div>
+                <div class="input-group">
+                    <label for="days-silent">Days Since Last Transmission</label>
+                    <input type="number" id="days-silent" min="0" required placeholder="e.g., 3">
+                </div>
+                <button type="submit">Initialize Tracking Sequence</button>
+            </form>
+        </div>
+
+        <div class="panel manifest">
+            <h2>CURRENT THREAT MANIFEST</h2>
+            <div id="target-list">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('radar-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Get Form Values
+            const name = document.getElementById('target-name').value;
+            const sector = document.getElementById('last-sector').value;
+            const days = parseInt(document.getElementById('days-silent').value);
+
+            // Determine Threat Level Matrix
+            let threatLevel = "";
+            let threatClass = "";
+            let statusBrief = "";
+
+            if (days <= 2) {
+                threatLevel = "LEVEL 1: JUST BUSY";
+                statusBrief = "Target likely navigating an asteroid field of work emails. Hold position.";
+            } else if (days <= 5) {
+                threatLevel = "LEVEL 2: ATMOSPHERIC RE-ENTRY";
+                statusBrief = "Target viewed Instagram story without replying. Friction levels rising.";
+            } else if (days <= 10) {
+                threatLevel = "LEVEL 3: ACTIVE AVOIDANCE";
+                statusBrief = "Signal jamming detected. Read receipts disabled. Defensive maneuvers likely.";
+            } else if (days <= 20) {
+                threatLevel = "LEVEL 4: EVENT HORIZON";
+                statusBrief = "Point of no return crossed. Time-dilation will render future replies highly awkward.";
+            } else {
+                threatLevel = "LEVEL 5: CAVE DWELLER";
+                threatClass = "level-5";
+                statusBrief = "Radio silence absolute. Target has presumably entered witness protection or a cave without Wi-Fi.";
+            }
+
+            // Create Target Card HTML
+            const targetList = document.getElementById('target-list');
+            const targetCard = document.createElement('div');
+            targetCard.className = `target-card ${threatClass}`;
+            
+            targetCard.innerHTML = `
+                <div class="target-header">
+                    <span>IDENT: ${name.toUpperCase()}</span>
+                    <span class="threat-badge">${threatLevel}</span>
+                </div>
+                <div><strong>LAST KNOWN SECTOR:</strong> ${sector.toUpperCase()}</div>
+                <div><strong>DURATION OF SILENCE:</strong> ${days} EARTH DAYS</div>
+                <div style="margin-top: 10px; font-style: italic; font-size: 0.9rem;">
+                    &gt; STATUS: ${statusBrief}
+                </div>
+            `;
+
+            // Insert at the top of the manifest
+            targetList.insertBefore(targetCard, targetList.firstChild);
+
+            // Reset Form and trigger a diagnostic audio alert (beep)
+            document.getElementById('radar-form').reset();
+            playDiagnosticPing();
+        });
+
+        // Synthetic Audio Ping using Web Audio API
+        function playDiagnosticPing() {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // High pitch radar ping
+            
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.4); // Fade out
+
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.4);
+        }
+    </script>
+</body>
+</html>
